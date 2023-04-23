@@ -1,0 +1,23 @@
+fieldset{
+    padding: 25px;
+    margin:auto;
+    width: auto;
+}
+div{
+    padding: 250px;
+}
+h1{
+    text-align: center;
+}
+form{
+    text-align: center;
+}
+
+input {
+    margin: 25px;
+    padding: 25px;
+}
+.flash_message{
+    height: 100px;
+    max-height: 700px;
+}
