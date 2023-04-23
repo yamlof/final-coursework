@@ -1,14 +1,13 @@
 from flask import Blueprint, render_template, request,flash,jsonify
-from .models import Manga, Chapters
-from .scraping import Mangafreak
-from bs4 import BeautifulSoup
 import requests
+from flask_login import login_required
 
 views = Blueprint('views' , __name__)
 
 
 
 @views.route('/', methods=['GET', 'POST'])
+
 def display_manga():
     url = "https://community-manga-eden.p.rapidapi.com/list/0"
 

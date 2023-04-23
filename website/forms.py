@@ -1,7 +1,7 @@
 from flask import render_template,request,flash,redirect,url_for,Blueprint
 from .models import User
 from . import db
-from flask_login import logout_user
+from flask_login import logout_user,login_required
 
 
 forms = Blueprint('forms', __name__)
@@ -59,16 +59,17 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if user:
-            return redirect(url_for('home.html'))
+            return redirect(url_for('views.home'))
         else:
             flash('email does not exist', category='error')
 
 
-    return render_template(url_for('login.html'))
+    return render_template('login.html')
 
 
 #logout page route
-@forms.route('/logout')
+@forms.route('/logout',methods=[ 'POST'])
+@login_required
 def logout():
     logout_user()
-    return redirect(url_for('register.html'))
+    return redirect(url_for('forms.login'))
