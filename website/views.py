@@ -9,7 +9,14 @@ views = Blueprint('views' , __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def display_manga():
-    response = requests.get('https://api.mangadex.org')
+
+    endpoint = 'https://api.mangadex.org'
+    manga_id = 'f98660a1-d2e2-461c-960d-7bd13df8b76d'
+    r = requests.get(f"{endpoint}/manga/{manga_id}/feed")
+    processed_data = [chapter["id"] for chapter in r.json()["data"]]
+    return render_template('home.html', data=jsonify(processed_data))
+
+    """response = requests.get('https://api.mangadex.org')
     data = response.json()
     processed_data = process_data(data)
     return render_template('views.home',data = jsonify(processed_data))
@@ -20,7 +27,7 @@ def process_data(data):
     r = requests.get(f"{data_dict}/manga/{manga_id}/feed")
 
     processed_data = ([chapter["id"] for chapter in r.json()["data"]])
-    return processed_data
+    return processed_data"""
 
 
 
