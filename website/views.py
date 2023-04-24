@@ -1,26 +1,26 @@
-from flask import Blueprint, render_template, request,flash,jsonify
+from flask import Blueprint, render_template, request,flash,jsonify,Flask
 import requests
 from flask_login import login_required
+import json
 
 views = Blueprint('views' , __name__)
 
 
 
 @views.route('/', methods=['GET', 'POST'])
-
 def display_manga():
-    url = "https://community-manga-eden.p.rapidapi.com/list/0"
-
-    headers = {
-	"content-type": "application/octet-stream",
-	"X-RapidAPI-Key": "c050c47ec0mshbad7e0b618d47f1p1c6d33jsn884f15dde2fd",
-	"X-RapidAPI-Host": "community-manga-eden.p.rapidapi.com"
-    }
-
-    response = requests.get(url, headers=headers)
-
+    response = requests.get('https://api.mangadex.org')
     data = response.json()
-    return render_template('home.html')
+    processed_data = process_data(data)
+    return render_template('views.home',data = jsonify(processed_data))
+
+def process_data(data):
+    data_dict = json.loads(data)
+    manga_id = "f98660a1-d2e2-461c-960d-7bd13df8b76d"
+    r = requests.get(f"{data_dict}/manga/{manga_id}/feed")
+
+    processed_data = ([chapter["id"] for chapter in r.json()["data"]])
+    return processed_data
 
 
 
