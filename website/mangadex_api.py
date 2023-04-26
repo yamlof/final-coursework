@@ -1,11 +1,70 @@
-from bs4 import BeautifulSoup
-from urllib.request import urlopen,Request
 import requests
+from datetime import datetime,timedelta
 from website.models import Manga
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+import json
 
-r = Request(
+client_id = "HHGSX"
+client_secret = "edwinelliotevans"
+
+
+def make_session(client_id ,client_secret):
+        
+        # define URL for the login API endpoint
+        url = 'https://api.mangadex.org/auth/login'
+        
+        # dictionary creation
+        data = {'username' : "HHGSX", "password" : 'edwinelliotevans'}
+
+        # sends a POST request to the API with the data dictionary
+        response = requests.post(url,data = json.dumps(data))
+        response_json = response.json()
+
+        # then checks if the response status is 200 (OK)
+        if response.status_code != 200:
+             raise Exception ('failed to log in to MangaDex API')
+
+        # extract the variables bellow from the response JSON
+        session_token = response_json['token']
+        expires_in = response_json['expiresIn']
+        expires = datetime.now() + timedelta(seconds=expires_in)
+        refresh_token = response_json['resfresh']
+
+        return session_token,expires , refresh_token
+
+
+class MangaDex:
+
+    def __init__(self,client_id :str, client_secret : str):
+        self.session_token ,self.refresh_token,self.expires = make_session(client_id,client_secret)
+        self.base_url = "https://api.mangadex.org"
+
+
+    #manga 
+    def get_manga_by_id(self,manga_id:str) -> Manga:
+
+        # send GET request to the API with the authorization from the function before
+        url = f'{self.base_url}/manga/{manga_id}'
+        headers = {'Autorization':f'Bearer{self.session_token}'}
+
+        response = requests.get(url ,headers=headers)
+        response_json = response.json()
+
+        # extract variables below
+        manga_id = response['data']['id']
+        title = response_json['data']['attributes']['title']['en']
+        description = response_json['data']['attributes']['description']['en']
+        cover_art = response_json['data']['attributes']['cover_art']
+        authors = [author['attributes']['name'] for author in response_json['data']['relationships'] if author['type'] == 'author']
+
+        # creates a manga object with the extracted information and returns it
+        return Manga(manga_id,title,description,cover_art,authors)
+ 
+
+
+
+
+
+"""r = Request(
     url='https://w15.mangafreak.net/',
     headers={'User-Agent':'Mozilla/5.0'})
 
@@ -41,7 +100,7 @@ class Mangafreak():
             title=element.select_one(url_selector).text,
             url = element.select_one(url_selector).get("href"),
         )
-        return manga
+        return manga"""
 
 
     # returns a manga object with its atributes

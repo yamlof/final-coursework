@@ -24,4 +24,4 @@ class Chapters(db.Model):
     page_number=db.Column(db.Integer)
     page_source=db.Column(db.String(150))
     manga_title=db.Column(db.String(150),db.ForeignKey('manga.title'))
-    manga=db.relationship('Manga', backref= 'chapters')
+    manga=db.relationship('Manga')

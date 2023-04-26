@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <title>{% block title %}Home{% endblock %}</title>
+  </head>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+          <a class="navbar-brand" href="#">Lector</a>
+          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Updates</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Library</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Settings</a>
+              </li>
+          </ul>
+
+          <form method="POST" action="{{ url_for('forms.logout') }}">
+            <input class="btn btn-danger" type="submit" value="Log Out">
+          </form>
+
+          <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" action="{{ url_for('views.display_manga') }}">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
+        </div>
+</nav>
+<body>
+    <div class="container-fluid">
+        <div class="read-intro bg-light">
+            <div class="row">
+                <div class="cover col-*">
+                    <img class="shadow" src="{{url_for('static', filename='a_returners_magic_should_be_special.jpg')}}"">
+                </div>
+                <div class="info col">
+                    <h2 class="head"> A a returners magic should be special</h2>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Genre:</th>
+                                <td> Fantasy </td>
+                            </tr>
+                            <tr>
+                                <th>Artist:</th>
+                                <td> Jeon Sun-wook </td>
+                            </tr>
+                            <tr>
+                                <th>Rating:</th>
+                                <td><i class="fa fa-star fa-2x"></i><i class="fa fa-star fa-2x"></i><i
+                                    class="fa fa-star fa-2x"></i><i class="fa fa-star fa-2x"></i><i
+                                    class="fa fa-star-half-alt fa-2x"></i> <span
+                                    class="font-weight-bold ml-3">(9/10)</span></td>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <p class="description">"Now that I'm back, I won't allow my loved ones to die again!"
+
+                      The Shadow Labyrinth - the deadliest catastrophe humanity has ever known.
+                      Desir Arman, one of the six remaining survivors of mankind, is inside the Labyrinth. The six of them attempt to clear the final level of the Labyrinth but ultimately fail, and the world comes to an end.
+                      However, when Desir thought he would meet his demise, what appears before him is the world… thirteen years ago?!
+                      
+                      Desir is returned to the past, back to the time when he enrolled at the nation's finest magic academy, Havrion. He is reunited with his precious friends, and he is determined to change the past to save the world and his loved ones…!
+                      
+                      Three years remain before the emergence of the Shadow World!
+                      Change the past and gather powerful comrades to save mankind!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <a class="btn btn-red my-3 mx-1 px-5" href="#">Add to Library</a>
+        <a class="btn btn-red my-3 mx-1 px-5" href="#">Start Reading Chapter 1</a>
+    </div>
+</body>
+
+
+</html>

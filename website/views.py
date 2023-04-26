@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request,flash,jsonify,Flask
 import requests
 from flask_login import login_required
-import json
+from .mangadex_api import MangaDex
 
 views = Blueprint('views' , __name__)
 
@@ -9,12 +9,24 @@ views = Blueprint('views' , __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def display_manga():
+    mangadex = MangaDex("HHGSX","edwinelliotevans")
+    manga = mangadex.get_manga_by_id('')
+    return render_template('home.html',manga=manga)
+    
 
-    endpoint = 'https://api.mangadex.org'
+@views.route('/manga',methods=['GET','POST'])
+def manga_details():
+    return render_template("manga.html")
+
+
+
+
+
+    """endpoint = 'https://api.mangadex.org'
     manga_id = 'f98660a1-d2e2-461c-960d-7bd13df8b76d'
     r = requests.get(f"{endpoint}/manga/{manga_id}/feed")
     processed_data = [chapter["id"] for chapter in r.json()["data"]]
-    return render_template('home.html', data=jsonify(processed_data))
+    return render_template('home.html', data=jsonify(processed_data))"""
 
     """response = requests.get('https://api.mangadex.org')
     data = response.json()
