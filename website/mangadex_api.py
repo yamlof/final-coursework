@@ -7,7 +7,7 @@ client_id = "HHGSX"
 client_secret = "edwinelliotevans"
 
 
-def make_session(client_id ,client_secret):
+def make_session():
         
         # define URL for the login API endpoint
         url = 'https://api.mangadex.org/auth/login'
@@ -16,12 +16,14 @@ def make_session(client_id ,client_secret):
         data = {'username' : "HHGSX", "password" : 'edwinelliotevans'}
 
         # sends a POST request to the API with the data dictionary
-        response = requests.post(url,data = json.dumps(data))
+        response = requests.post(url, json=data)
         response_json = response.json()
 
         # then checks if the response status is 200 (OK)
         if response.status_code != 200:
+             print("response.status_code")
              raise Exception ('failed to log in to MangaDex API')
+
 
         # extract the variables bellow from the response JSON
         session_token = response_json['token']
@@ -34,8 +36,8 @@ def make_session(client_id ,client_secret):
 
 class MangaDex:
 
-    def __init__(self,client_id :str, client_secret : str):
-        self.session_token ,self.refresh_token,self.expires = make_session(client_id,client_secret)
+    def __init__(self):
+        self.session_token ,self.refresh_token,self.expires = make_session()
         self.base_url = "https://api.mangadex.org"
 
 

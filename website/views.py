@@ -9,7 +9,7 @@ views = Blueprint('views' , __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def display_manga():
-    mangadex = MangaDex("HHGSX","edwinelliotevans")
+    mangadex = MangaDex()
     manga = mangadex.get_manga_by_id('')
     return render_template('home.html',manga=manga)
     
