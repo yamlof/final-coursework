@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request,flash,jsonify,Flask
-import requests
-from flask_login import login_required
-from .mangadex_api import MangaDex
+from flask import Blueprint, render_template,flash
+from .mangareques import chapter_request
+from .models import User,Chapters
+import os
+
 
 views = Blueprint('views' , __name__)
 
@@ -9,14 +10,41 @@ views = Blueprint('views' , __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def display_manga():
-    mangadex = MangaDex()
-    manga = mangadex.get_manga_by_id('')
-    return render_template('home.html',manga=manga)
+
+    return render_template('home.html')
     
 
 @views.route('/manga',methods=['GET','POST'])
 def manga_details():
-    return render_template("manga.html")
+    return render_template("base_manga.html")
+
+@views.route('/manga/sololeveling',methods=['GET', 'POST'])
+def solo_leveling():
+    return render_template("sololeveling.html")
+
+@views.route('/manga/onepiece',methods=['GET', 'POST'])
+def one_piece():
+    return render_template("onepiece.html")
+
+@views.route('/manga/jujutsukaisen',methods=['GET', 'POST'])
+def jujutsu_kaisen():
+    chapter_request()
+    data = Chapters.query.all()
+
+    return render_template("jujutsukaisen.html",data = data)
+
+@views.route('/manga/jujutsukaisenchapter',methods=['GET', 'POST'])
+def jujutsu_kaisen_chapter():
+    image_folder = "website/static/A Dream"
+    images = os.listdir(image_folder)
+
+    return render_template("base_chapter.html",images=images)
+
+
+@views.route('/chapter',methods=['GET', 'POST'])
+def chapter():
+    return render_template("base_chapter.html")
+
 
 
 

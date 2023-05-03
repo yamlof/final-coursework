@@ -32,6 +32,7 @@ def create_app():
     app.register_blueprint(forms, url_prefix='/')
 
     from website.models import User,Manga,Chapters
+    from .mangareques import chapter_request
 
 
 

@@ -10,7 +10,6 @@
 
     <title>{% block title %}Home{% endblock %}</title>
   </head>
-
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -19,7 +18,7 @@
           <a class="navbar-brand" href="#">Lector</a>
           <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="{{ url_for('views.display_manga') }}">Home <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Updates</a>
@@ -42,25 +41,42 @@
           </form>
         </div>
 </nav>
+
 <body>
     <div class="container-fluid">
         <div class="read-intro bg-light">
             <div class="row">
                 <div class="cover col-*">
+
+                  {% block shadow %}
                     <img class="shadow" src="{{url_for('static', filename='a_returners_magic_should_be_special.jpg')}}"">
+                  {% endblock %}
+
                 </div>
                 <div class="info col">
-                    <h2 class="head"> A a returners magic should be special</h2>
+
+                    {% block h2 %}
+                    <h2 class="head"></h2>
+                    {% endblock %}
+
                     <table class="table table-borderless">
                         <tbody>
+                            {% block td %}
                             <tr>
                                 <th scope="row">Genre:</th>
+                                
                                 <td> Fantasy </td>
+                                
                             </tr>
+                            {% endblock %}
+                            {% block artist %}
                             <tr>
                                 <th>Artist:</th>
+                                
                                 <td> Jeon Sun-wook </td>
+                                
                             </tr>
+                            {% endblock %}
                             <tr>
                                 <th>Rating:</th>
                                 <td><i class="fa fa-star fa-2x"></i><i class="fa fa-star fa-2x"></i><i
@@ -70,26 +86,39 @@
                                 </td>
                             </tr>
                         </tbody>
-
                     </table>
-                    <p class="description">"Now that I'm back, I won't allow my loved ones to die again!"
-
-                      The Shadow Labyrinth - the deadliest catastrophe humanity has ever known.
-                      Desir Arman, one of the six remaining survivors of mankind, is inside the Labyrinth. The six of them attempt to clear the final level of the Labyrinth but ultimately fail, and the world comes to an end.
-                      However, when Desir thought he would meet his demise, what appears before him is the world… thirteen years ago?!
-                      
-                      Desir is returned to the past, back to the time when he enrolled at the nation's finest magic academy, Havrion. He is reunited with his precious friends, and he is determined to change the past to save the world and his loved ones…!
-                      
-                      Three years remain before the emergence of the Shadow World!
-                      Change the past and gather powerful comrades to save mankind!</p>
+                    {% block content %}
+                    <p class="description">""</p>
+                    {% endblock %}
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <a class="btn btn-red my-3 mx-1 px-5" href="#">Add to Library</a>
-        <a class="btn btn-red my-3 mx-1 px-5" href="#">Start Reading Chapter 1</a>
+    <div class="row" style="width: 100%;">
+        <a class="btn btn-red my-3 mx-1 px-5">Add to Library</a>
+        <a class="btn btn-red my-3 mx-1 px-5">Start Reading Chapter 1</a>
     </div>
+    <div class="table table-bordered">
+      <table style="width: 100%;">
+        <thead>
+            <tr>
+                <th scope="col">Chapter Number</th>
+                <th scope="col">Title</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+              <tr>
+                <td>{{ row.chapter_number }}</td>
+                
+                <td><a href="{{ url_for('views.jujutsu_kaisen_chapter')}}">{{ row.title }}</a></td></a>
+              </tr>
+            
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
 </body>
 
 

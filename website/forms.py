@@ -4,12 +4,7 @@ from . import db
 from flask_login import logout_user,login_required,login_user
 from werkzeug.security import generate_password_hash,check_password_hash
 
-
-
 forms = Blueprint('forms', __name__)
-
-
-
 
 #registration page route
 @forms.route('/register', methods =["POST","GET"])

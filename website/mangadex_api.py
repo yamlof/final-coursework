@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime,timedelta
-from website.models import Manga
+from .models import Manga
 import json
 
 client_id = "HHGSX"
@@ -39,6 +39,7 @@ class MangaDex:
     def __init__(self):
         self.session_token ,self.refresh_token,self.expires = make_session()
         self.base_url = "https://api.mangadex.org"
+        
 
 
     #manga 
@@ -46,7 +47,7 @@ class MangaDex:
 
         # send GET request to the API with the authorization from the function before
         url = f'{self.base_url}/manga/{manga_id}'
-        headers = {'Autorization':f'Bearer{self.session_token}'}
+        headers = {'Autorization':f'Bearer{"session_token"}'}
 
         response = requests.get(url ,headers=headers)
         response_json = response.json()

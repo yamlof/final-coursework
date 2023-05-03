@@ -12,7 +12,9 @@ BOT_NAME = "mangafreak"
 SPIDER_MODULES = ["mangafreak.spiders"]
 NEWSPIDER_MODULE = "mangafreak.spiders"
 
-
+HTTPERROR_ALLOWED_CODES  =[404]
+USER_AGENT = 'quotesbot (+http://www.yourdomain.com)'
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "mangafreak (+http://www.yourdomain.com)"
 
@@ -53,6 +55,24 @@ ROBOTSTXT_OBEY = True
 #DOWNLOADER_MIDDLEWARES = {
 #    "mangafreak.middlewares.MangafreakDownloaderMiddleware": 543,
 #}
+## settings.py
+
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+    'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+    'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+}
+## settings.py
+
+FAKEUSERAGENT_PROVIDERS = [
+    'scrapy_fake_useragent.providers.FakeUserAgentProvider',  # This is the first provider we'll try
+    'scrapy_fake_useragent.providers.FakerProvider',  # If FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
+    'scrapy_fake_useragent.providers.FixedUserAgentProvider',  # Fall back to USER_AGENT value
+]
+
+## Set Fallback User-Agent
+USER_AGENT = '<your user agent string which you will fall back to if all other providers fail>'
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html

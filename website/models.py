@@ -9,9 +9,9 @@ class User(db.Model):
     email = db.Column(db.String(150),unique=True,nullable= False)
     password = db.Column(db.String(150))
     manga = db.relationship('Manga')
+    titles_library = db.Column(db.String(150))
     
 class Manga(db.Model):
-    cover=db.Column(db.String(150))
     title=db.Column(db.String(150),primary_key=True)
     author=db.Column(db.String(150))
     summary=db.Column(db.String(150))
@@ -20,8 +20,8 @@ class Manga(db.Model):
 
 
 class Chapters(db.Model):
-    page_name=db.Column(db.String(150),primary_key=True)
-    page_number=db.Column(db.Integer)
-    page_source=db.Column(db.String(150))
+    title = db.Column(db.String(150),primary_key = True)
+    chapter_number = db.Column(db.String(150))
     manga_title=db.Column(db.String(150),db.ForeignKey('manga.title'))
-    manga=db.relationship('Manga')
+
+
