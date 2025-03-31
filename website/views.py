@@ -12,8 +12,73 @@ def display_manga():
     solo_levelling = "32d76d19-8a05-4db0-9fc2-e0b0648fe9d0"
     one_piece = "a1c7c817-4e59-43b7-9365-09675a149a6f"
 
-    return render_template('home.html',jk = jujutsu_kaisen,sl = solo_levelling, op = one_piece)
+    jk_cover_url = f"/manga-cover/{jujutsu_kaisen}"
+    sl_cover_url = f"/manga-cover/{solo_levelling}"
+    op_cover_url = f"/manga-cover/{one_piece}"
     
+
+
+    return render_template('home.html',
+                           jk = jujutsu_kaisen,
+                           sl = solo_levelling,
+                           op = one_piece,
+                           jk_cover = jk_cover_url,
+                           sl_cover = sl_cover_url,
+                           op_cover = op_cover_url)
+
+@views.route('/manga-cover/<manga_id>')
+def manga_cover_proxy(manga_id):
+    """
+    Proxy function to fetch and serve manga covers directly from MangaDex
+    """
+    try:
+        # Step 1: Get manga details to find cover art relationship
+        manga_response = requests.get(
+            f"https://api.mangadex.org/manga/{manga_id}?includes[]=cover_art"
+        )
+        
+        if manga_response.status_code != 200:
+            return Response("Failed to retrieve manga details", status=manga_response.status_code)
+        
+        manga_data = manga_response.json()
+        
+        # Step 2: Extract cover art ID and filename
+        cover_filename = None
+        for relationship in manga_data["data"]["relationships"]:
+            if relationship["type"] == "cover_art" and "attributes" in relationship:
+                cover_filename = relationship["attributes"].get("fileName")
+                break
+                
+        # If we couldn't find filename directly (older API versions), make another request
+        if not cover_filename and relationship["type"] == "cover_art":
+            cover_id = relationship["id"]
+            cover_response = requests.get(f"https://api.mangadex.org/cover/{cover_id}")
+            if cover_response.status_code == 200:
+                cover_data = cover_response.json()
+                cover_filename = cover_data["data"]["attributes"]["fileName"]
+        
+        if not cover_filename:
+            return Response("Cover not found", status=404)
+            
+        # Step 3: Fetch the actual image
+        image_url = f"https://uploads.mangadex.org/covers/{manga_id}/{cover_filename}"
+        image_response = requests.get(image_url, stream=True)
+        
+        if image_response.status_code != 200:
+            return Response("Failed to retrieve cover image", status=image_response.status_code)
+            
+        # Step 4: Stream the image back to the client with proper headers
+        return Response(
+            image_response.raw.read(),
+            content_type=image_response.headers['content-type'],
+            headers={
+                'Cache-Control': 'public, max-age=86400',  # Cache for 1 day
+            }
+        )
+        
+    except Exception as e:
+        return Response(f"Error: {str(e)}", status=500)
+
 @views.route('/manga',methods=['GET','POST'])
 def manga_details():
     return render_template("base_manga.html")
@@ -22,6 +87,9 @@ def manga_details():
 def jujutsu_kaisen(manga_id):
 
     base_url = "https://api.mangadex.org"
+
+    cover =f"/manga-cover/{manga_id}"
+
 
     try:
         manga_response = requests.get(
@@ -63,7 +131,7 @@ def jujutsu_kaisen(manga_id):
 
             chapters.append(data)
         
-        return render_template("jujutsukaisen.html", data=chapters,title = title,description = description)
+        return render_template("jujutsukaisen.html", data=chapters,title = title,description = description,cover = cover)
     
     except Exception as e:
         print(f"Error in jujutsu_kaisen route: {str(e)}")
