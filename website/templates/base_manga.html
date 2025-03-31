@@ -109,9 +109,9 @@
         <tbody>
             {% for row in data %}
               <tr>
-                <td>{{ row.chapter_number }}</td>
+                <td>{{ row.chapter_num }}</td>
                 
-                <td><a href="{{ url_for('views.jujutsu_kaisen_chapter')}}">{{ row.title }}</a></td></a>
+                <td><a href="{{ url_for('views.jujutsu_kaisen_chapter',chapter_id = row.id)}}">{{ row.chapter_title }}</a></td></a>
               </tr>
             
             {% endfor %}

@@ -1,6 +1,7 @@
 from . import db
 
 
+
 # created database models
 
 class User(db.Model):

@@ -32,9 +32,6 @@ def create_app():
     app.register_blueprint(forms, url_prefix='/')
 
     from website.models import User,Manga,Chapters
-    from .mangareques import chapter_request
-
-
 
     #creates database with all resources available
     with app.app_context():

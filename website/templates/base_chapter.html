@@ -61,7 +61,7 @@
       <div class="carousel-inner">
         {% for image in images %}
           <div class="carousel-item {% if loop.index0 == 0 %} active {% endif %}" id="slide{{ loop.index }}">
-            <img class="d-block w-100" src="{{ image_url }}" alt="Image {{ loop.index }}">
+            <img class="d-block w-100" src="{{ image }}" alt="Image {{ loop.index }}">
           </div>
         {% endfor %}  
       </div>

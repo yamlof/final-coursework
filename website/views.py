@@ -1,35 +1,40 @@
-from flask import Blueprint, render_template,flash
-from .mangareques import chapter_request
+from flask import Blueprint, render_template,flash,Response,request
 from .models import User,Chapters
 import os,requests
 from . import db
 
 views = Blueprint('views' , __name__)
 
-
-
 @views.route('/', methods=['GET', 'POST'])
 def display_manga():
 
-    return render_template('home.html')
-    
+    jujutsu_kaisen = "c52b2ce3-7f95-469c-96b0-479524fb7a1a"
+    solo_levelling = "32d76d19-8a05-4db0-9fc2-e0b0648fe9d0"
+    one_piece = "a1c7c817-4e59-43b7-9365-09675a149a6f"
 
+    return render_template('home.html',jk = jujutsu_kaisen,sl = solo_levelling, op = one_piece)
+    
 @views.route('/manga',methods=['GET','POST'])
 def manga_details():
     return render_template("base_manga.html")
 
-@views.route('/manga/sololeveling',methods=['GET', 'POST'])
-def solo_leveling():
-    return render_template("sololeveling.html")
+@views.route('/manga/<manga_id>',methods=['GET', 'POST'])
+def jujutsu_kaisen(manga_id):
 
-@views.route('/manga/onepiece',methods=['GET', 'POST'])
-def one_piece():
-    return render_template("onepiece.html")
-
-@views.route('/manga/jujutsukaisen',methods=['GET', 'POST'])
-def jujutsu_kaisen():
-    manga_id = "c52b2ce3-7f95-469c-96b0-479524fb7a1a"  # Jujutsu Kaisen manga ID
     base_url = "https://api.mangadex.org"
+
+    try:
+        manga_response = requests.get(
+            f"{base_url}/manga/{manga_id}",
+            params={"translatedLanguage[]" : ["en"]}
+        )
+
+        manga_json = manga_response.json()
+
+        title = manga_json['data']['attributes']['title']['en']
+        description = manga_json['data']['attributes']['description']['en']
+    except Exception as e:
+        raise e
     
     try:
         # Fetch chapters for the manga
@@ -42,39 +47,23 @@ def jujutsu_kaisen():
             return render_template("error.html", error=f"API error: {response.status_code}"), response.status_code
         
         chapters_json = response.json()
+
+        chapters = []
         
-        # Process each chapter (you might want to limit this to avoid overloading)
-        for chapter_data in chapters_json['data']:  # Limit to first 10 chapters
+        for chapter_data in chapters_json['data']:
             chapter_id = chapter_data['id']
             chapter_num = chapter_data['attributes']['chapter']
             chapter_title = chapter_data['attributes']['title']
-            
-            # Check if chapter already exists in database
-            existing_chapter = Chapters.query.filter_by(chapter_number=chapter_num).first()
-            if not existing_chapter:
-                # Get manga title
-                manga_info = requests.get(f"{base_url}/manga/{manga_id}")
-                if manga_info.ok:
-                    manga_title = manga_info.json()['data']['attributes']['title']['en']
-                    
-                    # Add to database
-                    new_chapter = Chapters(
-                        title=chapter_title,
-                        chapter_number=chapter_num,
-                        manga_title=manga_title
-                    )
-                    
-                    try:
-                        db.session.add(new_chapter)
-                        db.session.commit()
-                    except Exception as e:
-                        db.session.rollback()
-                        print(f"Database error: {str(e)}")
+
+            data = {
+                "id" : chapter_id,
+                "chapter_num" : chapter_num,
+                "chapter_title" : chapter_title
+            }
+
+            chapters.append(data)
         
-        # Get all chapters from database
-        data = Chapters.query.filter_by(manga_title="Jujutsu Kaisen").order_by(Chapters.chapter_number).all()
-        
-        return render_template("jujutsukaisen.html", data=data)
+        return render_template("jujutsukaisen.html", data=chapters,title = title,description = description)
     
     except Exception as e:
         print(f"Error in jujutsu_kaisen route: {str(e)}")
@@ -90,36 +79,59 @@ def jujutsu_kaisen_chapter(chapter_id):
     
     # Check if the response is successful
     if response.status_code == 200:
-        data = response.json()
-        
-        # Extract the base URL and image data
-        base_url = data.get("baseUrl", "")
-        image_data = data.get("chapter", {}).get("data", [])
-        image_urls = []
+        r_json = response.json()
 
-        # Construct the full URLs for each image
-        if base_url and image_data:
-            for image in image_data:
-                # Construct the full image URL for original quality
-                image_url = f"{base_url}/data/{data['chapter']['hash']}/{image}"
-                image_urls.append(image_url)
+        host = r_json["baseUrl"]
+        chapter_hash = r_json["chapter"]["hash"]
+        data = r_json["chapter"]["data"]
+        data_saver = r_json["chapter"]["dataSaver"]
+
+        images =[f"/manga/proxy-image/{chapter_hash}/{image}" for image in data] 
+
+        #images = [response.url for response in images]
         
         # Pass the list of image URLs to the template for rendering
-        return render_template("base_chapter.html", images=image_urls)
+        return render_template("base_chapter.html", images=images)
     
     else:
         # Handle the case where the API request fails
         return f"Error: Could not fetch chapter data (Status Code: {response.status_code})", 500
 
+# Creates a proxy route to display from the api to website
+@views.route('/manga/proxy-image/<chapter_hash>/<path:image_filename>')
+def proxy_manga_image(chapter_hash, image_filename):
+    # Create the original image URL based on MangaDex API structure
+    # You might want to cache the baseUrl as it could be the same for multiple images
+    api_url = "https://api.mangadex.org/at-home/server"
+    
+    # Optional: You can choose between data and dataSaver with a query parameter
+    use_data_saver = request.args.get('data_saver', 'false').lower() == 'true'
+    
+    # Determine which MangaDex endpoint to use based on data_saver preference
+    endpoint = "data-saver" if use_data_saver else "data"
+    
+    # Construct the full image URL
+    image_url = f"https://uploads.mangadex.org/{endpoint}/{chapter_hash}/{image_filename}"
+    
+    try:
+        # Make the request to the original image
+        response = requests.get(
+            image_url,
+            stream=True  # Important for larger files
+        )
+        
+        # Return the image with correct content type
+        return Response(
+            response.iter_content(chunk_size=10*1024),
+            content_type=response.headers.get('Content-Type', 'image/jpeg'),
+            status=response.status_code
+        )
+    except Exception as e:
+        return f"Error fetching image: {str(e)}", 500
 
 @views.route('/chapter',methods=['GET', 'POST'])
 def chapter():
     return render_template("base_chapter.html")
-
-
-
-
-
 
     """endpoint = 'https://api.mangadex.org'
     manga_id = 'f98660a1-d2e2-461c-960d-7bd13df8b76d'
