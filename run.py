@@ -4,4 +4,4 @@ app = create_app()
 
 if __name__ == '__main__':
     #when runing the app all changes will be updated
-    app.run(debug=True,port=443)
+    app.run(host ='0.0.0.0',debug=True,port=5000)
