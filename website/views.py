@@ -131,7 +131,7 @@ def jujutsu_kaisen(manga_id):
 
             chapters.append(data)
         
-        return render_template("jujutsukaisen.html", data=chapters,title = title,description = description,cover = cover)
+        return render_template("manga.html", data=chapters,title = title,description = description,cover = cover)
     
     except Exception as e:
         print(f"Error in jujutsu_kaisen route: {str(e)}")
